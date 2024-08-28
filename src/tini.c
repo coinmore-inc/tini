@@ -640,7 +640,7 @@ void read_env_files(const char* folder) {
                 char* value = strtok(NULL, "\n");
                 if (key && value) {
                     setenv(key, value, 1);
-					PRINT_DEBUG("set variable %s from %s", key, value);
+					PRINT_DEBUG("set variable %s from %s", key, file);
                 }
             }
 
