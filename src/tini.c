@@ -95,7 +95,7 @@ static int32_t expect_status[(STATUS_MAX - STATUS_MIN + 1) / 32];
 #define SUBREAPER_ENV_VAR "TINI_SUBREAPER"
 #else
 #define HAS_SUBREAPER 0
-#define OPT_STRING "p:hvwgle:"
+#define OPT_STRING "p:hvwgdle:"
 #endif
 
 #define VERBOSITY_ENV_VAR "TINI_VERBOSITY"
