@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <dirent.h>
 
 #include "tiniConfig.h"
 #include "tiniLicense.h"
@@ -305,6 +306,8 @@ int add_expect_status(char* arg) {
 	return 0;
 }
 
+char *secret_folder = NULL;
+
 int parse_args(const int argc, char* const argv[], char* (**child_args_ptr_ptr)[], int* const parse_fail_exitcode_ptr) {
 	char* name = argv[0];
 
@@ -346,6 +349,10 @@ int parse_args(const int argc, char* const argv[], char* (**child_args_ptr_ptr)[
 
 			case 'g':
 				kill_process_group++;
+				break;
+
+			case 'd':
+				secret_folder = optarg;
 				break;
 
 			case 'e':
@@ -603,6 +610,44 @@ int reap_zombies(const pid_t child_pid, int* const child_exitcode_ptr) {
 	return 0;
 }
 
+void read_env_files(const char* folder) {
+    DIR* dir;
+    struct dirent* entry;
+
+    if ((dir = opendir(folder)) == NULL) {
+        perror("opendir");
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type == DT_REG && strstr(entry->d_name, ".env")) {
+            char filepath[1024];
+            snprintf(filepath, sizeof(filepath), "%s/%s", folder, entry->d_name);
+            FILE* file = fopen(filepath, "r");
+            if (file == NULL) {
+                perror("fopen");
+                continue;
+            }
+
+            char line[1024];
+            while (fgets(line, sizeof(line), file)) {
+				if (line[0] == '#') {
+					continue;
+				}
+
+                char* key = strtok(line, "=");
+                char* value = strtok(NULL, "\n");
+                if (key && value) {
+                    setenv(key, value, 1);
+                }
+            }
+
+            fclose(file);
+        }
+    }
+
+    closedir(dir);
+}
 
 int main(int argc, char *argv[]) {
 	pid_t child_pid;
@@ -616,6 +661,10 @@ int main(int argc, char *argv[]) {
 	int parse_args_ret = parse_args(argc, argv, &child_args_ptr, &parse_exitcode);
 	if (parse_args_ret) {
 		return parse_exitcode;
+	}
+
+	if (secret_folder) {
+		read_env_files(secret_folder);
 	}
 
 	/* Parse environment */
