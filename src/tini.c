@@ -248,6 +248,7 @@ void print_usage(char* const name, FILE* const file) {
 	fprintf(file, "  -v: Generate more verbose output. Repeat up to 3 times.\n");
 	fprintf(file, "  -w: Print a warning when processes are getting reaped.\n");
 	fprintf(file, "  -g: Send signals to the child's process group.\n");
+	fprintf(file, "  -d: specific the environment file folder to load, e.g. \"-d /etc/secret\"\n");
 	fprintf(file, "  -e EXIT_CODE: Remap EXIT_CODE (from 0 to 255) to 0 (can be repeated).\n");
 	fprintf(file, "  -l: Show license and exit.\n");
 #endif
@@ -639,6 +640,7 @@ void read_env_files(const char* folder) {
                 char* value = strtok(NULL, "\n");
                 if (key && value) {
                     setenv(key, value, 1);
+					PRINT_DEBUG("set variable %s from %s", key, value);
                 }
             }
 
