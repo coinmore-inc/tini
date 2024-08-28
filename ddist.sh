@@ -37,6 +37,7 @@ SRC="/tini"
 
 docker run -it --rm \
   --volume="${HERE}:${SRC}" \
+  --volume="${HERE}/dist:/tmp/tini-build" \
   -e BUILD_DIR=/tmp/tini-build \
   -e SOURCE_DIR="${SRC}" \
   -e FORCE_SUBREAPER="${FORCE_SUBREAPER-1}" \
