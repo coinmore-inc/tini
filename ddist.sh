@@ -20,7 +20,7 @@ if [[ -n "${CC-}" ]]; then
 fi
 
 # Cleanup the build dir
-rm -f "${HERE}/dist"/*
+rm -rf "${HERE}/dist"/*
 
 # Create the build image
 echo "build: ${IMG}"
